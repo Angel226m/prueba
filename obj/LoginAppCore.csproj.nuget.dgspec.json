@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\angel\\Desktop\\ceplan\\LoginAppCore.csproj": {}
+    "C:\\Users\\angel\\Desktop\\ceplan\\LoginAppCore.csproj": {}
   },
   "projects": {
-    "c:\\Users\\angel\\Desktop\\ceplan\\LoginAppCore.csproj": {
+    "C:\\Users\\angel\\Desktop\\ceplan\\LoginAppCore.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\angel\\Desktop\\ceplan\\LoginAppCore.csproj",
+        "projectUniqueName": "C:\\Users\\angel\\Desktop\\ceplan\\LoginAppCore.csproj",
         "projectName": "LoginAppCore",
-        "projectPath": "c:\\Users\\angel\\Desktop\\ceplan\\LoginAppCore.csproj",
+        "projectPath": "C:\\Users\\angel\\Desktop\\ceplan\\LoginAppCore.csproj",
         "packagesPath": "C:\\Users\\angel\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\angel\\Desktop\\ceplan\\obj\\",
+        "outputPath": "C:\\Users\\angel\\Desktop\\ceplan\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\angel\\AppData\\Roaming\\NuGet\\NuGet.Config"

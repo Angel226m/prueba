@@ -54,8 +54,7 @@ public class HomeController : Controller
         ViewBag.Nombre                = User.Identity!.Name;
         ViewBag.Email                 = User.FindFirstValue(ClaimTypes.Email);
         ViewBag.NombreCompleto        = User.FindFirstValue("NombreCompleto");
-        ViewBag.SessionWarningSeconds = _config.GetValue<int>("AppSettings:SessionWarningSeconds", 30);
-        ViewBag.SessionTimeoutMinutes = _config.GetValue<int>("AppSettings:SessionTimeoutMinutes", 1);
+        ViewBag.SessionWarningSeconds = _config.GetValue<int>("AppSettings:SessionWarningSeconds", 60);
         return View();
     }
 

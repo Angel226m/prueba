@@ -67,3 +67,4 @@ C:\Users\angel\Desktop\ceplan\obj\Debug\net8.0\refint\LoginAppCore.dll
 C:\Users\angel\Desktop\ceplan\obj\Debug\net8.0\LoginAppCore.pdb
 C:\Users\angel\Desktop\ceplan\obj\Debug\net8.0\LoginAppCore.genruntimeconfig.cache
 C:\Users\angel\Desktop\ceplan\obj\Debug\net8.0\ref\LoginAppCore.dll
+C:\Users\angel\Desktop\ceplan\obj\Debug\net8.0\LoginAppCore.sourcelink.json
