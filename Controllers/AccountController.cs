@@ -233,7 +233,7 @@ public class AccountController : Controller
                 ExpiresUtc   = model.Recordar
                     ? DateTimeOffset.UtcNow.AddDays(7)
                     : DateTimeOffset.UtcNow.AddMinutes(
-                        _config.GetValue<int>("AppSettings:SessionTimeoutMinutes", 1)
+                        _config.GetValue<int>("AppSettings:SessionTimeoutMinutes", 1))
             };
 
             await HttpContext.SignInAsync(
