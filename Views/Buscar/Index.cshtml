@@ -1,0 +1,217 @@
+@* Views/Buscar/Index.cshtml — Sistema de búsqueda CEPLAN *@
+@using LoginAppCore.Models
+@{
+    ViewData["Title"] = "Buscar en el Sistema";
+    var query = (string?)ViewBag.Query;
+    var tieneResultados = (bool)(ViewBag.TieneResultados ?? false);
+    var usuarios = (List<UsuarioItem>?)ViewBag.ResultadosUsuarios ?? new();
+    var mensajes = (List<Mensaje>?)ViewBag.ResultadosMensajes ?? new();
+}
+
+<style>
+    .search-wrap { padding:14px 20px 0; max-width:900px; margin:0 auto; }
+    .search-bread { font-size:.7rem; color:#9CA3AF; margin-bottom:3px; }
+    .search-title { font-size:1.3rem; font-weight:700; color:#1E2533; margin-bottom:14px; }
+
+    .search-form { background:#fff; border:1px solid #E5E7EB; border-radius:8px; padding:20px; margin-bottom:20px; }
+    .search-input-group { position:relative; }
+    .search-input {
+        width:100%; background:#F9FAFB; border:1px solid #E5E7EB; border-radius:6px;
+        padding:10px 16px 10px 40px; font-size:.9rem; color:#374151;
+        outline:none; transition:border-color .2s, box-shadow .2s;
+    }
+    .search-input:focus { border-color:#3B82F6; box-shadow:0 0 0 3px rgba(59,130,246,0.1); }
+    .search-icon {
+        position:absolute; left:12px; top:50%; transform:translateY(-50%);
+        width:18px; height:18px; color:#9CA3AF; pointer-events:none;
+    }
+    .search-btn {
+        position:absolute; right:8px; top:50%; transform:translateY(-50%);
+        background:#1B5DA8; color:#fff; border:none; border-radius:4px;
+        padding:6px 16px; font-size:.8rem; font-weight:500; cursor:pointer;
+        transition:background .2s;
+    }
+    .search-btn:hover { background:#164E98; }
+    .search-hint { font-size:.75rem; color:#6B7280; margin-top:6px; }
+
+    .results-section { background:#fff; border:1px solid #E5E7EB; border-radius:8px; padding:20px; margin-bottom:20px; }
+    .results-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+    .results-title { font-size:1rem; font-weight:600; color:#1E2533; }
+    .results-count { font-size:.8rem; color:#6B7280; }
+
+    .result-group { margin-bottom:24px; }
+    .result-group:last-child { margin-bottom:0; }
+    .result-group-title {
+        font-size:.85rem; font-weight:600; color:#374151; margin-bottom:8px;
+        padding-bottom:4px; border-bottom:1px solid #F3F4F6;
+    }
+
+    .result-item {
+        display:flex; align-items:center; gap:12px; padding:10px;
+        border:1px solid #F3F4F6; border-radius:6px; margin-bottom:6px;
+        transition:border-color .2s, background .2s; cursor:pointer;
+    }
+    .result-item:hover { border-color:#E5E7EB; background:#F9FAFB; }
+    .result-icon { width:32px; height:32px; border-radius:50%; background:#F3F4F6; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .result-content { flex:1; min-width:0; }
+    .result-title { font-size:.85rem; font-weight:500; color:#1E2533; margin-bottom:1px; }
+    .result-desc { font-size:.75rem; color:#6B7280; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+    .no-results {
+        text-align:center; padding:40px 20px; color:#6B7280;
+    }
+    .no-results-icon { font-size:3rem; margin-bottom:12px; color:#D1D5DB; }
+    .no-results-text { font-size:.9rem; margin-bottom:4px; }
+    .no-results-hint { font-size:.75rem; color:#9CA3AF; }
+
+    .search-suggestions {
+        background:#F8FAFC; border:1px solid #E2E8F0; border-radius:6px;
+        padding:16px; margin-top:20px;
+    }
+    .suggestions-title { font-size:.8rem; font-weight:600; color:#374151; margin-bottom:8px; }
+    .suggestion-tag {
+        display:inline-block; background:#E2E8F0; color:#475569;
+        padding:3px 8px; border-radius:12px; font-size:.7rem; margin:2px 4px 2px 0;
+        cursor:pointer; transition:background .2s;
+    }
+    .suggestion-tag:hover { background:#CBD5E1; }
+
+    @@media (max-width:768px) {
+        .search-wrap { padding:8px 12px 0; }
+        .result-item { flex-direction:column; align-items:flex-start; gap:8px; }
+        .result-content { width:100%; }
+        .results-header { flex-direction:column; align-items:flex-start; gap:4px; }
+    }
+</style>
+
+<div class="search-wrap">
+    <p class="search-bread">Sistema &gt; Búsqueda</p>
+    <h1 class="search-title">Buscar en el Sistema</h1>
+
+    <!-- Formulario de búsqueda -->
+    <div class="search-form">
+        <form method="get" action="/Buscar">
+            <div class="search-input-group">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="m21 21-4.35-4.35"/>
+                </svg>
+                <input type="text" name="q" class="search-input"
+                       placeholder="Buscar usuarios, mensajes, contenido..."
+                       value="@query" autocomplete="off" />
+                <button type="submit" class="search-btn">Buscar</button>
+            </div>
+            <div class="search-hint">
+                Busca por nombre de usuario, email, contenido de mensajes o palabras clave
+            </div>
+        </form>
+    </div>
+
+    @if (tieneResultados)
+    {
+        @if (usuarios.Any() || mensajes.Any())
+        {
+            <!-- Resultados de búsqueda -->
+            <div class="results-section">
+                <div class="results-header">
+                    <h2 class="results-title">Resultados para "@query"</h2>
+                    <span class="results-count">@(usuarios.Count + mensajes.Count) resultado(s)</span>
+                </div>
+
+                @if (usuarios.Any())
+                {
+                    <div class="result-group">
+                        <div class="result-group-title">
+                            <i class="bi bi-people-fill" style="margin-right:6px;"></i>
+                            Usuarios (@usuarios.Count)
+                        </div>
+                        @foreach (var usuario in usuarios)
+                        {
+                            <div class="result-item" onclick="window.location.href='/Perfil'">
+                                <div class="result-icon" style="background:#E0E7FF;">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="#3B82F6">
+                                        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                                        <circle cx="12" cy="7" r="4"/>
+                                    </svg>
+                                </div>
+                                <div class="result-content">
+                                    <div class="result-title">@usuario.NombreCompleto</div>
+                                    <div class="result-desc">@usuario.NombreUsuario • @usuario.Email</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+
+                @if (mensajes.Any())
+                {
+                    <div class="result-group">
+                        <div class="result-group-title">
+                            <i class="bi bi-envelope-fill" style="margin-right:6px;"></i>
+                            Mensajes (@mensajes.Count)
+                        </div>
+                        @foreach (var mensaje in mensajes.Take(5))
+                        {
+                            <div class="result-item" onclick="window.location.href='/Mensajes/Detalle/@mensaje.Id'">
+                                <div class="result-icon" style="background:#ECFDF5;">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="#10B981">
+                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                        <polyline points="22,6 12,13 2,6"/>
+                                    </svg>
+                                </div>
+                                <div class="result-content">
+                                    <div class="result-title">@mensaje.Asunto</div>
+                                    <div class="result-desc">
+                                        De: @mensaje.RemitenteNombre • @mensaje.FechaEnvio.ToString("dd/MM/yyyy")
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <!-- Sin resultados -->
+            <div class="results-section">
+                <div class="no-results">
+                    <div class="no-results-icon">🔍</div>
+                    <div class="no-results-text">No se encontraron resultados para "@query"</div>
+                    <div class="no-results-hint">Intenta con términos diferentes o más generales</div>
+                </div>
+
+                <div class="search-suggestions">
+                    <div class="suggestions-title">Sugerencias de búsqueda:</div>
+                    <span class="suggestion-tag" onclick="document.querySelector('.search-input').value='angel'; document.querySelector('form').submit();">angel</span>
+                    <span class="suggestion-tag" onclick="document.querySelector('.search-input').value='admin'; document.querySelector('form').submit();">admin</span>
+                    <span class="suggestion-tag" onclick="document.querySelector('.search-input').value='mensaje'; document.querySelector('form').submit();">mensaje</span>
+                    <span class="suggestion-tag" onclick="document.querySelector('.search-input').value='reunión'; document.querySelector('form').submit();">reunión</span>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <!-- Estado inicial sin búsqueda -->
+        <div class="results-section">
+            <div style="text-align:center; padding:40px 20px; color:#6B7280;">
+                <div style="font-size:3rem; margin-bottom:12px;">💡</div>
+                <div style="font-size:.9rem; margin-bottom:8px;">¿Qué te gustaría buscar?</div>
+                <div style="font-size:.75rem; color:#9CA3AF;">
+                    Puedes buscar usuarios, mensajes, documentos y más recursos del sistema
+                </div>
+            </div>
+
+            <div class="search-suggestions">
+                <div class="suggestions-title">Búsquedas populares:</div>
+                <span class="suggestion-tag" onclick="document.querySelector('.search-input').value='usuarios'; document.querySelector('form').submit();">usuarios</span>
+                <span class="suggestion-tag" onclick="document.querySelector('.search-input').value='mensajes'; document.querySelector('form').submit();">mensajes</span>
+                <span class="suggestion-tag" onclick="document.querySelector('.search-input').value='reportes'; document.querySelector('form').submit();">reportes</span>
+                <span class="suggestion-tag" onclick="document.querySelector('.search-input').value='configuración'; document.querySelector('form').submit();">configuración</span>
+            </div>
+        </div>
+    }
+</div>
+
+@Html.AntiForgeryToken()

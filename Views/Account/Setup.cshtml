@@ -1,0 +1,183 @@
+@* ============================================================
+   Views/Account/Setup.cshtml
+   Pantalla de Bienvenida / Activación de cuenta — CEPLAN
+   ============================================================ *@
+@model SetupViewModel
+@{ ViewData["Title"] = "Activación de cuenta — CEPLAN"; Layout = null; }
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Activación de cuenta — CEPLAN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --rojo:#7B1618; --azul:#1B5DA8; }
+        html, body { height:100%; font-family:'Outfit','Segoe UI',sans-serif; background:#E8EAED; }
+
+        .pag { display:flex; flex-direction:column; min-height:100vh; }
+
+        /* ── Topbar ─────────────────────────────────── */
+        .topbar {
+            height:64px; background:var(--rojo);
+            display:flex; align-items:center; justify-content:flex-end;
+            padding:0 32px; flex-shrink:0; z-index:10;
+        }
+        .btn-q {
+            width:34px; height:34px; border-radius:50%;
+            border:2px solid rgba(255,255,255,.55); background:transparent;
+            color:#fff; font-size:.95rem; font-weight:700; cursor:pointer;
+            display:flex; align-items:center; justify-content:center;
+            transition:background .2s;
+        }
+        .btn-q:hover { background:rgba(255,255,255,.18); border-color:#fff; }
+
+        /* ── Main ───────────────────────────────────── */
+        .main {
+            flex:1; position:relative;
+            display:flex; align-items:center; justify-content:center;
+            padding:40px 16px;
+            overflow:hidden;
+        }
+
+        /* Fondo base gris */
+        .fondo {
+            position:absolute; inset:0;
+            background: #E8EAED;
+        }
+
+        /* Llama — ocupa TODO el fondo */
+        .fondo-llama {
+            position:absolute; inset:0;
+            width:100%; height:100%;
+            object-fit:cover;
+            object-position:center bottom;
+            filter: grayscale(100%) brightness(2.1) contrast(0.38);
+            opacity:.85;
+            pointer-events:none;
+            user-select:none;
+        }
+
+        /* ── Card ───────────────────────────────────── */
+        .card {
+            position:relative; z-index:2;
+            background:#fff; border-radius:14px;
+            box-shadow:0 10px 44px rgba(0,0,0,.18);
+            width:100%; max-width:376px;
+            padding:36px 32px 30px;
+            display:flex; flex-direction:column; align-items:center; text-align:center;
+            animation:fadeUp .45s ease both;
+        }
+        @@keyframes fadeUp {
+            from { opacity:0; transform:translateY(18px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        .ico { width:86px; height:86px; border-radius:50%; background:#FEF0EF; display:flex; align-items:center; justify-content:center; margin-bottom:22px; }
+        .ico svg { width:56px; height:56px; }
+
+        .titulo { font-size:1.2rem; font-weight:700; color:#1E2533; margin-bottom:14px; }
+        .desc { font-size:.9rem; color:#555; line-height:1.7; margin-bottom:28px; }
+        .desc p+p { margin-top:4px; }
+
+        .btn {
+            display:block; width:100%; padding:13px;
+            background:var(--azul); color:#fff; border:none;
+            border-radius:8px; font-family:inherit; font-size:.97rem;
+            font-weight:600; text-decoration:none; text-align:center; cursor:pointer;
+            box-shadow:0 4px 14px rgba(27,93,168,.35);
+            transition:background .2s, transform .15s;
+        }
+        .btn:hover { background:#154d8e; transform:translateY(-1px); }
+
+        /* ── Footer ─────────────────────────────────── */
+        .footer {
+            background:#fff; border-top:1px solid #E0E3E9;
+            min-height:68px; display:flex; align-items:center;
+            justify-content:flex-end; padding:0 32px; gap:0; flex-shrink:0;
+        }
+        .f-logos { display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+        .f-sep { width:1px; height:36px; background:#D1D5DB; flex-shrink:0; margin:0 4px; }
+
+        /* PCM — imagen real */
+        .f-pcm-img { height:42px; width:auto; object-fit:contain; flex-shrink:0; display:block; }
+
+        /* CEPLAN — solo texto, sin check, pegado a PCM */
+        .f-ceplan {
+            display:flex; align-items:center;
+            background:#6b7280;
+            border-radius:4px;
+            height:42px;
+            padding:0 12px;
+        }
+        .f-ceplan-txt {
+            font-size:.67rem; font-weight:500;
+            color:#fff; line-height:1.4;
+        }
+
+        @@media (max-width:600px) { .card { max-width:92vw; } }
+        @@media (max-width:480px) {
+            .topbar { padding:0 16px; }
+            .card { padding:28px 18px 24px; }
+            .footer { padding:8px 16px; justify-content:center; gap:10px; }
+            .f-sep { display:none; }
+            .fondo-llama { height:50%; opacity:.35; }
+        }
+    </style>
+</head>
+<body>
+<div class="pag">
+    <header class="topbar">
+        <button class="btn-q" type="button" aria-label="Ayuda">?</button>
+    </header>
+
+    <main class="main">
+        <div class="fondo" aria-hidden="true"></div>
+        <img class="fondo-llama" src="/images/image.png" alt="" aria-hidden="true" />
+
+        <div class="card">
+            <div class="ico" aria-hidden="true">
+                <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M28 6C28 6 16 17 16 31c0 7 4 13 12 17 8-4 12-10 12-17C40 17 28 6 28 6Z" fill="#FECACA" stroke="#E05252" stroke-width="1.6" stroke-linejoin="round"/>
+                    <circle cx="28" cy="31" r="5" fill="#fff" stroke="#E05252" stroke-width="1.6"/>
+                    <path d="M18 35 L12 43 L20 41Z" fill="#FECACA" stroke="#E05252" stroke-width="1.4" stroke-linejoin="round"/>
+                    <path d="M38 35 L44 43 L36 41Z" fill="#FECACA" stroke="#E05252" stroke-width="1.4" stroke-linejoin="round"/>
+                    <path d="M24 48 C22 52 24 55 28 55 C32 55 34 52 32 48" fill="#F97316" stroke="#EA580C" stroke-width="1.2" stroke-linejoin="round"/>
+                    <circle cx="40" cy="16" r="9" fill="#22C55E"/>
+                    <polyline points="35.5,16 38.5,19.5 44.5,12.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+
+          <h1 class="titulo">¡Bienvenida, @(ViewBag.NombreUsuario ?? "Angel")!</h1>
+
+
+            <div class="desc">
+                <p>Su cuenta en el aplicativo X está activada.</p>
+                <p>Ya puede iniciar sesión.</p>
+            </div>
+
+            <a class="btn" href="/Account/Login">Iniciar sesión</a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="f-logos">
+
+            
+            <img class="f-pcm-img" src="/images/PCM-PCM.png" alt="Presidencia del Consejo de Ministros" />
+
+            <div class="f-sep" aria-hidden="true"></div>
+
+            <div class="f-ceplan">
+                <div class="f-ceplan-txt">Centro Nacional de<br/>Planeamiento<br/>Estratégico</div>
+            </div>
+
+        </div>
+    </footer>
+</div>
+</body>
+</html>

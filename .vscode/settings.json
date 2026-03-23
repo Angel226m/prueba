@@ -1,0 +1,11 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^python -c \"import hashlib, os, base64; password = b'Angel2206'; salt = os\\.urandom\\(32\\); h = hashlib\\.pbkdf2_hmac\\('sha256', password, salt, 100000, dklen=32\\); print\\('HASH=' \\+ base64\\.b64encode\\(h\\)\\.decode\\(\\)\\); print\\('SALT=' \\+ base64\\.b64encode\\(salt\\)\\.decode\\(\\)\\)\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "mkdir": true,
+        "copy": true,
+        "docker-compose": true
+    }
+}

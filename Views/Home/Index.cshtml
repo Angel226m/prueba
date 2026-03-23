@@ -1,0 +1,119 @@
+@* ============================================================
+   Views/Home/Index.cshtml — Dashboard principal CEPLAN
+   Muestra: estadísticas del día, info de sesión activa,
+            mensajes recientes. Modal sesión gestionado en _Layout.
+   ============================================================ *@
+@using LoginAppCore.Models
+@using LoginAppCore.Services
+@{
+    ViewData["Title"] = "Panel de control";
+    var stats    = ViewBag.Stats as EstadisticasHoy;
+    var mensajes = ViewBag.MensajesRecientes as List<Mensaje>;
+    int noLeidos = ViewBag.NoLeidos ?? 0;
+    var peruTime = SecurityHelper.GetPeruDateTime(); // Hora robusta de Perú
+}
+
+<div class="dash-wrap">
+
+    <!-- Saludo -->
+    <div class="dash-welcome">
+        <h1 class="dash-titulo">
+            Bienvenido, @ViewBag.Nombre
+            <span class="dash-badge"><i class="bi bi-shield-check"></i> Sesión activa</span>
+        </h1>
+        <p class="dash-fecha">
+            @peruTime.ToString("dddd dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-PE"))
+        </p>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-ico ico-green"><i class="bi bi-check-circle"></i></div>
+            <div>
+                <div class="stat-val">@(stats?.AccesosOk ?? 0)</div>
+                <div class="stat-lbl">Accesos hoy</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-ico ico-red"><i class="bi bi-exclamation-circle"></i></div>
+            <div>
+                <div class="stat-val">@(stats?.IntentosFallidos ?? 0)</div>
+                <div class="stat-lbl">Intentos fallidos</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-ico ico-blue"><i class="bi bi-people"></i></div>
+            <div>
+                <div class="stat-val">@(stats?.TotalUsuarios ?? 0)</div>
+                <div class="stat-lbl">Usuarios activos</div>
+            </div>
+        </div>
+        <a class="stat-card" asp-action="Index" asp-controller="Mensajes">
+            <div class="stat-ico ico-amber"><i class="bi bi-envelope"></i></div>
+            <div>
+                <div class="stat-val">@noLeidos</div>
+                <div class="stat-lbl">Sin leer</div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Sesión + Mensajes -->
+    <div class="info-grid">
+
+        <!-- Sesión activa -->
+        <div class="info-card">
+            <div class="info-card-header">
+                <i class="bi bi-person-badge"></i> Información de sesión
+            </div>
+            <div class="ses-dl">
+                <div class="ses-row"><dt class="ses-dt">Usuario</dt><dd class="ses-dd">@ViewBag.Nombre</dd></div>
+                <div class="ses-row"><dt class="ses-dt">Correo</dt><dd class="ses-dd" style="word-break:break-all">@ViewBag.Email</dd></div>
+                <div class="ses-row"><dt class="ses-dt">Acceso</dt><dd class="ses-dd">@peruTime.ToString("HH:mm:ss")</dd></div>
+                <div class="ses-row"><dt class="ses-dt">Estado</dt><dd class="ses-dd" style="color:#065F46;font-weight:600"><i class="bi bi-shield-fill-check me-1"></i>OWASP compliant</dd></div>
+            </div>
+        </div>
+
+        <!-- Mensajes recientes -->
+        <div class="info-card">
+            <div class="info-card-header">
+                <i class="bi bi-envelope"></i> Mensajes recientes
+                @if (noLeidos > 0)
+                {
+                    <span class="badge-nl ms-1">@noLeidos</span>
+                }
+                <a asp-action="Index" asp-controller="Mensajes" class="link-ver">Ver todos</a>
+            </div>
+            @if (mensajes == null || !mensajes.Any())
+            {
+                <div class="dash-empty">
+                    <i class="bi bi-inbox" style="font-size:2rem"></i>
+                    <span>No tienes mensajes recientes.</span>
+                </div>
+            }
+            else
+            {
+                foreach (var m in mensajes)
+                {
+                    bool nr = !m.Leido;
+                    string ini = (m.RemitenteNombre.Length > 0 ? m.RemitenteNombre[0].ToString() : "?").ToUpper();
+                    <a class="msj-mini @(nr ? "unread" : "")"
+                       asp-action="Detalle" asp-controller="Mensajes" asp-route-id="@m.Id">
+                        <div class="msj-av">@ini</div>
+                        <div class="msj-mi">
+                            <div class="msj-mf">
+                                <span style="font-size:.84rem;@(nr?"font-weight:700":"")">@m.RemitenteNombre</span>
+                                <span class="msj-mas">@m.FechaEnvio.ToString("dd/MM HH:mm")</span>
+                            </div>
+                            <div class="msj-msub @(nr ? "fw-semibold" : "")">@m.Asunto</div>
+                        </div>
+                        @if (nr) { <span class="msj-dot" aria-hidden="true"></span> }
+                    </a>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Token CSRF para extenderSesion desde _Layout.cshtml -->
+@Html.AntiForgeryToken()

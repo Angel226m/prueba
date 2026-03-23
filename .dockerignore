@@ -1,0 +1,12 @@
+# Ignorar bin y obj para evitar conflictos de restore/publish
+**/bin/
+**/obj/
+
+# Otros comunes en .NET
+*.user
+*.suo
+*.sln.docstates
+.vs/
+.vscode/
+*.cache
+nuget.config  # si tienes uno local con paths absolutos

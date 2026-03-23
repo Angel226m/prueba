@@ -1,0 +1,17 @@
+<!-- ============================================================
+     LoginAppCore.csproj
+     Archivo de proyecto ASP.NET Core 8 — CEPLAN Login System
+     Incluye: MVC, autenticación por cookies, SQL Server
+     ============================================================ -->
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>LoginAppCore</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient"             Version="5.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.2.0" />
+  </ItemGroup>
+</Project>

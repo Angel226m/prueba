@@ -1,0 +1,267 @@
+@* ============================================================
+   Views/Shared/_Layout.cshtml — CEPLAN
+   ============================================================ *@
+@using System.Security.Claims
+@using LoginAppCore.Models
+@{
+    var nombre     = User.Identity?.Name ?? "";
+    var inicial    = nombre.Length > 0 ? nombre[0].ToString().ToUpper() : "U";
+    var ctrl       = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    int noLeidos   = ViewBag.NoLeidos ?? 0;
+    int warnSec    = ViewBag.SessionWarningSeconds ?? 30;
+    int timeoutMin = ViewBag.SessionTimeoutMinutes ?? 1;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>@ViewData["Title"] — CEPLAN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/app.css" asp-append-version="true" />
+    <style>
+        /* ── Footer autenticado: izquierda, fondo gris — sobreescribe app.css ── */
+        body .app-footer {
+            background: #F4F5F7 !important;
+            border-top: 1px solid #E0E3E9 !important;
+            min-height: 62px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            padding: 0 16px !important;
+            gap: 0 !important;
+            flex-shrink: 0;
+            margin-top: auto;
+        }
+        .f-logos { display:flex !important; align-items:center !important; gap:0 !important; flex-wrap:nowrap !important; }
+        .f-pcm-img { height:42px; width:auto; object-fit:contain; flex-shrink:0; display:block; }
+        .f-ceplan-bloque {
+            display:flex; align-items:center;
+            background:#6b7280; border-radius:0 4px 4px 0;
+            height:42px; padding:0 10px; margin-left:0;
+        }
+        .f-ceplan-bloque span {
+            font-size:.61rem; font-weight:500;
+            color:#fff; line-height:1.35; white-space:nowrap;
+        }
+        .app-main { display:flex; flex-direction:column; }
+    </style>
+</head>
+<body class="app-body">
+
+<!-- ══ TOPBAR ══════════════════════════════════════════════════ -->
+<header class="app-topbar" aria-label="Barra institucional CEPLAN">
+    <div class="top-izq">
+        <button class="btn-hamburger" id="btnHam" aria-label="Menú" onclick="toggleSidebar()">
+            <span></span><span></span><span></span>
+        </button>
+        <a class="top-logo" asp-action="Index" asp-controller="Home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span>CEPLAN</span>
+        </a>
+    </div>
+
+    <div class="top-der">
+        <button class="btn-top-ico" aria-label="Ayuda">?</button>
+
+        <a class="btn-top-ico campana" asp-action="Index" asp-controller="Mensajes" aria-label="Mensajes">
+            <i class="bi bi-bell"></i>
+            @if (noLeidos > 0)
+            {
+                <span class="badge-camp">@(noLeidos > 9 ? "9+" : noLeidos.ToString())</span>
+            }
+        </a>
+
+        <div class="top-usuario">
+            <div class="top-avatar" aria-hidden="true">@inicial</div>
+            <div class="top-info">
+                <span class="top-nombre">@(ViewBag.NombreCompleto ?? nombre)</span>
+                <span class="top-rol">Operador</span>
+            </div>
+        </div>
+
+        <form asp-action="Logout" asp-controller="Account" method="post" class="d-inline">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn-logout" aria-label="Cerrar sesión">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Salir</span>
+            </button>
+        </form>
+    </div>
+</header>
+
+<!-- ══ WRAPPER ═════════════════════════════════════════════════ -->
+<div class="app-wrapper">
+
+    <nav class="sidebar" id="sidebar" aria-label="Menú principal">
+        <a class="sb-item @(ctrl == "Home" ? "sb-active" : "")"
+           asp-action="Index" asp-controller="Home" aria-label="Inicio">
+            <i class="bi bi-house-door"></i>
+            <span class="sb-label">Inicio</span>
+        </a>
+        <a class="sb-item @(ctrl == "Estadisticas" ? "sb-active" : "")"
+           asp-action="Index" asp-controller="Estadisticas" aria-label="Estadísticas del sistema">
+            <i class="bi bi-bar-chart-line"></i>
+            <span class="sb-label">Estadísticas</span>
+        </a>
+        <a class="sb-item @(ctrl == "Perfil" ? "sb-active" : "")"
+           asp-action="Index" asp-controller="Perfil" aria-label="Perfil">
+            <i class="bi bi-file-earmark-plus"></i>
+            <span class="sb-label">Perfil</span>
+        </a>
+        <a class="sb-item @(ctrl == "Buscar" ? "sb-active" : "")"
+           asp-action="Index" asp-controller="Buscar" aria-label="Buscar en el sistema">
+            <i class="bi bi-search"></i>
+            <span class="sb-label">Buscar</span>
+        </a>
+    </nav>
+
+    <main class="app-main" id="appMain">
+        @RenderBody()
+
+        <!-- Footer DENTRO del main, fondo gris, a la derecha del sidebar -->
+        <footer class="app-footer" aria-label="Pie de página institucional">
+            <div class="f-logos">
+                <img class="f-pcm-img" src="/images/PCM-PCM.png" alt="Presidencia del Consejo de Ministros" />
+                <div class="f-ceplan-bloque">
+                    <span>Centro Nacional de<br/>Planeamiento<br/>Estratégico</span>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+</div>
+
+<!-- ══ MODAL SESIÓN ════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalSesion" role="dialog" aria-modal="true" aria-label="Sesión por expirar" style="display:none">
+    <div class="modal-card">
+        <div class="modal-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+        </div>
+        <div class="modal-txt">
+            <p class="modal-titulo">Su sesión está a punto de expirar</p>
+            <p class="modal-desc">
+                Por seguridad, su sesión expirará en
+                <strong id="cuentaReg">@warnSec</strong> segundos.
+                Para continuar, seleccione 'Extender sesión'.
+            </p>
+        </div>
+        <button class="btn-extender" id="btnExtender" onclick="extenderSesion()">Extender sesión</button>
+    </div>
+</div>
+<script>
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('expanded');
+    document.getElementById('appMain').classList.toggle('shifted');
+}
+
+var WARN_SEC    = @warnSec;
+var TIMEOUT_MIN = @timeoutMin;
+
+var sessionTimer   = null;
+var countdownTimer = null;
+var modalVisible   = false;
+var lastThrottle   = 0;
+var THROTTLE_MS    = 3000;
+
+function onUserActivity() {
+    if (modalVisible) return;
+    var now = Date.now();
+    if (now - lastThrottle < THROTTLE_MS) return;
+    lastThrottle = now;
+    reiniciarTimer();
+}
+
+function reiniciarTimer() {
+    clearTimeout(sessionTimer);
+    sessionTimer = setTimeout(mostrarModal, TIMEOUT_MIN * 60 * 1000);
+}
+
+function mostrarModal() {
+    modalVisible = true;
+    clearTimeout(sessionTimer);
+    clearInterval(countdownTimer);
+
+    var modal    = document.getElementById('modalSesion');
+    var cuentaEl = document.getElementById('cuentaReg');
+    var restante = WARN_SEC;
+
+    if (cuentaEl) cuentaEl.textContent = restante;
+    modal.style.display = 'flex';
+
+    countdownTimer = setInterval(function () {
+        restante--;
+        if (cuentaEl) cuentaEl.textContent = restante;
+        if (restante <= 0) {
+            clearInterval(countdownTimer);
+            forzarLogout();
+        }
+    }, 1000);
+}
+
+function extenderSesion() {
+    clearInterval(countdownTimer);
+    fetch('/Account/ExtenderSesion', {
+        method: 'POST',
+        headers: {
+            'RequestVerificationToken': getToken(),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(function (res) {
+        if (res.ok) {
+            document.getElementById('modalSesion').style.display = 'none';
+            modalVisible  = false;
+            lastThrottle  = 0;
+            reiniciarTimer();
+        } else {
+            window.location.href = '/Account/Login?err=session';
+        }
+    })
+    .catch(function () {
+        window.location.href = '/Account/Login?err=session';
+    });
+}
+
+function forzarLogout() {
+    var form  = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/Account/Logout';
+    var token = getToken();
+    if (token) {
+        var input   = document.createElement('input');
+        input.type  = 'hidden';
+        input.name  = '__RequestVerificationToken';
+        input.value = token;
+        form.appendChild(input);
+    }
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function getToken() {
+    var el = document.querySelector('input[name="__RequestVerificationToken"]');
+    return el ? el.value : '';
+}
+
+['mousedown', 'keydown', 'scroll', 'touchstart', 'click'].forEach(function (ev) {
+    document.addEventListener(ev, onUserActivity, { passive: true, capture: true });
+});
+
+reiniciarTimer();
+</script>
+
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

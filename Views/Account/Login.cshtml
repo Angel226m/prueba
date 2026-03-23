@@ -1,0 +1,309 @@
+@* ============================================================
+   Views/Account/Login.cshtml — CEPLAN
+   ============================================================ *@
+@model LoginViewModel
+@{ ViewData["Title"] = "Iniciar Sesión — CEPLAN"; Layout = null; }
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Iniciar Sesión — CEPLAN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+        :root { --rojo:#7B1618; --azul:#1B5DA8; --azul2:#2C3E6B; --borde:#E0E3E9; }
+        html, body { height:100%; font-family:'Outfit','Segoe UI',sans-serif; background:#E8EAED; }
+
+        .pag { display:flex; flex-direction:column; min-height:100vh; }
+
+        /* ── Topbar ─────────────────────────────────── */
+        .topbar { height:64px; background:var(--rojo); display:flex; align-items:center; justify-content:space-between; padding:0 32px; flex-shrink:0; z-index:10; }
+        .logo { display:flex; align-items:center; gap:8px; color:#fff; text-decoration:none; }
+        .logo svg { width:22px; height:22px; stroke:#fff; fill:none; stroke-width:2.8; stroke-linecap:round; stroke-linejoin:round; }
+        .logo span { font-size:1.2rem; font-weight:700; letter-spacing:1.5px; }
+        .btn-q { width:34px; height:34px; border-radius:50%; border:2px solid rgba(255,255,255,.55); background:transparent; color:#fff; font-size:.95rem; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .2s; }
+        .btn-q:hover { background:rgba(255,255,255,.18); border-color:#fff; }
+
+        /* ── Main ───────────────────────────────────── */
+        .main { flex:1; position:relative; display:flex; align-items:center; justify-content:center; padding:40px 16px; overflow:hidden; }
+
+        /* Fondo base */
+        .fondo { position:absolute; inset:0; background:#E8EAED; }
+
+        /* Illustration.png cubre todo el fondo — gris claro blanquecino */
+        .fondo-img {
+            position:absolute; inset:0;
+            width:100%; height:100%;
+            object-fit:cover; object-position:center bottom;
+            filter: grayscale(100%) brightness(2.1) contrast(0.38);
+            opacity:.85;
+            pointer-events:none;
+            user-select:none;
+        }
+
+        /* ── Card ───────────────────────────────────── */
+        .card { position:relative; z-index:2; background:#fff; border-radius:14px; box-shadow:0 12px 48px rgba(0,0,0,.18); width:100%; max-width:376px; overflow:hidden; animation:fadeUp .45s ease both; }
+        @@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+        /* ── Tabs DNI/CE ────────────────────────────── */
+        .tabs { display:flex; width:100%; }
+        .tab { flex:1; padding:15px 0; border:none; font-family:inherit; font-size:.95rem; font-weight:600; cursor:pointer; transition:background .2s,color .2s; background:#E5E8EF; color:#888; }
+        .tab.active { background:var(--azul2); color:#fff; }
+        .tab:hover:not(.active) { background:#D8DCE6; color:#444; }
+
+        /* ── Form body ──────────────────────────────── */
+        .body { padding:28px 28px 24px; }
+
+        /* ── Campos ─────────────────────────────────── */
+        .campo { margin-bottom:18px; }
+        .campo label { display:block; font-size:.72rem; font-weight:700; color:#6B7280; letter-spacing:.6px; text-transform:uppercase; margin-bottom:6px; }
+        .wrap { position:relative; display:flex; align-items:center; }
+        .ico { position:absolute; left:13px; width:17px; height:17px; stroke:#B0B7C3; fill:none; stroke-width:1.8; pointer-events:none; flex-shrink:0; }
+        .wrap input { width:100%; padding:12px 13px 12px 40px; border:1.5px solid var(--borde); border-radius:9px; font-family:inherit; font-size:.9rem; color:#1E2533; background:#FAFBFC; outline:none; transition:border-color .2s,box-shadow .2s; }
+        .wrap input:focus { border-color:var(--azul); background:#fff; box-shadow:0 0 0 3px rgba(27,93,168,.12); }
+        .wrap input.err { border-color:#DC2626; background:#FFF5F5; }
+        .wrap input.err:focus { box-shadow:0 0 0 3px rgba(220,38,38,.1); }
+        .msg-err { font-size:.74rem; color:#DC2626; font-weight:500; margin-top:4px; display:flex; align-items:center; gap:4px; }
+        .msg-err svg { width:13px; height:13px; stroke:#DC2626; fill:none; flex-shrink:0; }
+
+        /* ── Ojo contraseña ─────────────────────────── */
+        .btn-ojo { position:absolute; right:11px; background:none; border:none; cursor:pointer; padding:4px; color:#B0B7C3; display:flex; align-items:center; transition:color .2s; }
+        .btn-ojo:hover { color:var(--azul); }
+        .btn-ojo svg { width:17px; height:17px; stroke:currentColor; fill:none; stroke-width:2; }
+        .oculto { display:none; }
+
+        /* ── Link olvidé ────────────────────────────── */
+        .olvide-row { display:flex; justify-content:flex-end; margin-top:7px; }
+        .link-olvide { font-size:.82rem; color:#DC2626; text-decoration:none; font-weight:500; }
+        .link-olvide:hover { text-decoration:underline; }
+
+        /* ── Botón Ingresar ─────────────────────────── */
+        .btn-ing { display:block; width:100%; padding:13px; margin-top:6px; background:var(--azul); color:#fff; border:none; border-radius:9px; font-family:inherit; font-size:.97rem; font-weight:600; cursor:pointer; box-shadow:0 4px 16px rgba(27,93,168,.35); transition:background .2s,transform .15s; }
+        .btn-ing:hover { background:#154d8e; transform:translateY(-1px); }
+        .spinner { display:none; width:18px; height:18px; border:2.5px solid rgba(255,255,255,.35); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; margin:0 auto; }
+        @@keyframes spin { to{transform:rotate(360deg)} }
+        .btn-ing.cargando .spinner { display:block; } .btn-ing.cargando .txt { display:none; }
+
+        /* ── Soporte ────────────────────────────────── */
+        .soporte { display:flex; align-items:flex-start; gap:9px; margin-top:20px; padding-top:18px; border-top:1px solid #F0F2F5; font-size:.82rem; color:#6B7280; line-height:1.5; }
+        .soporte-ico { width:32px; height:32px; background:#EFF6FF; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .soporte-ico svg { width:18px; height:18px; fill:none; stroke:var(--azul); stroke-width:1.8; }
+        .link-sop { color:var(--azul); text-decoration:none; font-weight:500; }
+        .link-sop:hover { text-decoration:underline; }
+
+        /* ── Card Bloqueado ─────────────────────────── */
+        .bloqueado { padding:44px 32px 38px; display:flex; flex-direction:column; align-items:center; text-align:center; }
+        .bloc-ico { width:74px; height:74px; border-radius:50%; background:rgba(27,93,168,.1); display:flex; align-items:center; justify-content:center; margin-bottom:18px; }
+        .bloc-ico svg { width:42px; height:42px; stroke:var(--azul); fill:none; stroke-width:1.6; }
+        .bloc-title { font-size:1.05rem; font-weight:700; color:#1E2533; margin-bottom:10px; }
+        .bloc-desc { font-size:.875rem; color:#6B7280; line-height:1.65; max-width:280px; }
+
+        /* ── Footer ─────────────────────────────────── */
+        .footer { background:#fff; border-top:1px solid #E0E3E9; min-height:68px; display:flex; align-items:center; justify-content:flex-end; padding:0 32px; flex-shrink:0; }
+        .f-logos { display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+        .f-sep { width:1px; height:36px; background:#D1D5DB; flex-shrink:0; margin:0 6px; }
+
+        /* PCM imagen real */
+        .f-pcm-img { height:42px; width:auto; object-fit:contain; flex-shrink:0; display:block; }
+
+        /* CEPLAN bloque gris */
+        .f-ceplan { display:flex; align-items:center; background:#6b7280; border-radius:4px; height:42px; padding:0 12px; }
+        .f-ceplan-txt { font-size:.67rem; font-weight:500; color:#fff; line-height:1.4; }
+
+        /* ── Barra sesión expirada ───────────────────── */
+        .notif { position:fixed; bottom:0; left:0; right:0; background:var(--azul); color:#fff; display:flex; align-items:center; gap:10px; padding:14px 28px; font-size:.87rem; z-index:200; animation:slideUp .3s ease; }
+        @@keyframes slideUp { from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
+        .notif svg { width:18px; height:18px; stroke:#fff; fill:none; flex-shrink:0; }
+
+        /* ── Responsive ─────────────────────────────── */
+        @@media (max-width:600px) { .card { max-width:95vw; } }
+        @@media (max-width:480px) {
+            .topbar { padding:0 16px; }
+            .body { padding:22px 18px 18px; }
+            .footer { padding:8px 16px; justify-content:center; }
+            .f-sep { display:none; }
+            .notif { padding:12px 16px; font-size:.82rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="pag">
+
+    <header class="topbar">
+        <a class="logo" href="/Account/Login">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>CEPLAN</span>
+        </a>
+        <button class="btn-q" type="button" aria-label="Ayuda">?</button>
+    </header>
+
+    <main class="main">
+        <div class="fondo" aria-hidden="true"></div>
+        <img class="fondo-img" src="/images/Illustration.png" alt="" aria-hidden="true" />
+
+        @if (ViewBag.Bloqueado == true)
+        {
+            <div class="card">
+                <div class="bloqueado">
+                    <div class="bloc-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="12" cy="8" r="4"/>
+                            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                            <path d="M17 13s2-1 4 1"/>
+                            <circle cx="21" cy="14" r="1"/>
+                        </svg>
+                    </div>
+                    <h2 class="bloc-title">Cuenta bloqueada<br/>temporalmente</h2>
+                    <p class="bloc-desc">
+                        Has excedido el número máximo de intentos fallidos (4).
+                        Por seguridad, tu cuenta ha sido bloqueada durante
+                        @if (ViewBag.TiempoRestante != null)
+                        {
+                            <strong>@ViewBag.TiempoRestante minutos</strong>
+                        }
+                        else
+                        {
+                            <strong>20 minutos</strong>
+                        }. Intenta nuevamente más tarde o contacta al administrador.
+                    </p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card">
+                <div class="tabs" role="tablist">
+                    <button type="button" class="tab active" role="tab" id="tabDni" aria-selected="true">DNI</button>
+                    <button type="button" class="tab" role="tab" id="tabCe" aria-selected="false">CE</button>
+                </div>
+
+                <div class="body">
+                    @if (TempData["Exito"] != null)
+                    {
+                        <div style="background:#F0FDF4;border:1px solid #BBF7D0;color:#166534;border-radius:8px;padding:10px 14px;font-size:.85rem;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+                            <svg style="width:15px;height:15px;stroke:#16A34A;fill:none;stroke-width:2;" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            <span>@Html.Raw(TempData["Exito"])</span>
+                        </div>
+                    }
+
+                    @{ bool hayError = !ViewData.ModelState.IsValid; }
+
+                    @* Mostrar errores generales del ModelState (no específicos de campo) *@
+                    @if (ViewData.ModelState[""]?.Errors.Any() == true)
+                    {
+                        <div style="background:#FEF2F2;border:1px solid #FECACA;color:#DC2626;border-radius:8px;padding:12px 14px;font-size:.85rem;margin-bottom:16px;display:flex;align-items:flex-start;gap:8px;">
+                            <svg style="width:16px;height:16px;stroke:#DC2626;fill:none;stroke-width:2;flex-shrink:0;margin-top:1px;" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>
+                            <div>
+                                @foreach (var error in ViewData.ModelState[""].Errors)
+                                {
+                                    <div>@Html.Raw(error.ErrorMessage)</div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <form asp-action="Login" asp-controller="Account" method="post" autocomplete="off">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+
+                        <div class="campo">
+                            <label asp-for="Credencial">Usuario</label>
+                            <div class="wrap">
+                                <svg class="ico" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                <input asp-for="Credencial" class="@(hayError ? "err" : "")" placeholder="Ingresar usuario" maxlength="100" autocomplete="username" spellcheck="false" />
+                            </div>
+                            @if (ViewData.ModelState[nameof(Model.Credencial)]?.Errors.Any() == true)
+                            {
+                                <div class="msg-err">
+                                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                    @ViewData.ModelState[nameof(Model.Credencial)].Errors.First().ErrorMessage
+                                </div>
+                            }
+                        </div>
+
+                        <div class="campo">
+                            <label asp-for="Password">Contraseña</label>
+                            <div class="wrap">
+                                <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                                <input asp-for="Password" id="iPass" type="password" class="@(hayError ? "err" : "")" placeholder="Ingresar contraseña" maxlength="128" autocomplete="current-password" />
+                                <button type="button" class="btn-ojo" onclick="togglePass()" aria-label="Mostrar contraseña">
+                                    <svg id="iOj1" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <svg id="iOj2" class="oculto" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                                </button>
+                            </div>
+                            @if (ViewData.ModelState[nameof(Model.Password)]?.Errors.Any() == true)
+                            {
+                                <div class="msg-err">
+                                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                    @ViewData.ModelState[nameof(Model.Password)].Errors.First().ErrorMessage
+                                </div>
+                            }
+                            <div class="olvide-row">
+                                <a href="#" class="link-olvide">¿Olvidó su contraseña?</a>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-ing" id="btnIng">
+                            <span class="txt">Ingresar</span>
+                            <span class="spinner"></span>
+                        </button>
+                    </form>
+
+                    <div class="soporte">
+                        <div class="soporte-ico" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path d="M3 11a9 9 0 0118 0"/><path d="M3 11v3a2 2 0 002 2h1a2 2 0 002-2v-2a2 2 0 00-2-2H4a1 1 0 00-1 1z"/><path d="M21 11v3a2 2 0 01-2 2h-1a2 2 0 01-2-2v-2a2 2 0 012-2h2a1 1 0 011 1z"/></svg>
+                        </div>
+                        <span>¿Necesita ayuda?,&nbsp;<a href="#" class="link-sop">contacte con el área de soporte.</a></span>
+                    </div>
+                </div>
+            </div>
+        }
+    </main>
+
+    <footer class="footer">
+        <div class="f-logos">
+            <img class="f-pcm-img" src="/images/PCM-PCM.png" alt="Presidencia del Consejo de Ministros" />
+            <div class="f-sep" aria-hidden="true"></div>
+            <div class="f-ceplan">
+                <div class="f-ceplan-txt">Centro Nacional de<br/>Planeamiento<br/>Estratégico</div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+@if (ViewBag.Aviso != null)
+{
+    <div class="notif" role="alert">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span>@ViewBag.Aviso</span>
+    </div>
+}
+
+<script>
+function togglePass() {
+    var i=document.getElementById('iPass'),a=document.getElementById('iOj1'),b=document.getElementById('iOj2');
+    if(i.type==='password'){i.type='text';a.classList.add('oculto');b.classList.remove('oculto');}
+    else{i.type='password';a.classList.remove('oculto');b.classList.add('oculto');}
+    i.focus();
+}
+var btn=document.getElementById('btnIng');
+if(btn) btn.addEventListener('click',function(){this.classList.add('cargando');setTimeout(()=>this.classList.remove('cargando'),6000);});
+document.querySelectorAll('.tab').forEach(function(t){
+    t.addEventListener('click',function(){
+        document.querySelectorAll('.tab').forEach(x=>{x.classList.remove('active');x.setAttribute('aria-selected','false');});
+        this.classList.add('active');this.setAttribute('aria-selected','true');
+    });
+});
+var u=document.querySelector('input[name="Credencial"]');
+if(u&&u.value==='')u.focus();
+</script>
+</body>
+</html>

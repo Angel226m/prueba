@@ -1,0 +1,107 @@
+@* Views/Perfil/Index.cshtml — Perfil de usuario CEPLAN *@
+@{
+    ViewData["Title"] = "Perfil de usuario";
+    var nombre = (string)(ViewBag.NombreCompleto ?? User.Identity?.Name ?? "Angel");
+    var email  = (string)(ViewBag.Email ?? "angel@ceplan.gob.pe");
+}
+<style>
+    .pf-wrap { padding:14px 20px 0; }
+    .pf-bread { font-size:.7rem; color:#9CA3AF; margin-bottom:3px; }
+    .pf-title { font-size:1.3rem; font-weight:700; color:#1E2533; margin-bottom:14px; }
+
+    .pf-head { background:#fff; border:1px solid #E5E7EB; border-radius:8px 8px 0 0; border-bottom:none; padding:12px 16px; display:flex; align-items:center; gap:11px; }
+    .pf-av { width:48px; height:48px; border-radius:50%; background:#C8D6E8; border:2px solid #dde3ec; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .pf-av svg { width:28px; height:28px; stroke:#6B7280; fill:none; stroke-width:1.5; }
+    .pf-hnombre { font-size:.85rem; font-weight:700; color:#1E2533; display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:1px; }
+    .pf-badge { font-size:.62rem; font-weight:600; background:#ECFDF5; color:#065F46; border:1px solid #A7F3D0; border-radius:20px; padding:1px 7px; }
+    .pf-cargo { font-size:.75rem; color:#6B7280; margin-bottom:1px; }
+    .pf-org   { font-size:.7rem; color:#9CA3AF; }
+
+    .pf-tabs { background:#fff; border:1px solid #E5E7EB; border-top:none; border-bottom:1px solid #E5E7EB; display:flex; padding:0 16px; }
+    .pf-tab { padding:8px 13px; font-size:.78rem; font-weight:500; color:#6B7280; border-bottom:2px solid transparent; transition:color .2s,border-color .2s; cursor:pointer; white-space:nowrap; }
+    .pf-tab:hover { color:#1E2533; }
+    .pf-tab.active { color:#1B5DA8; border-bottom-color:#1B5DA8; font-weight:600; }
+
+    .pf-body { background:#fff; border:1px solid #E5E7EB; border-top:none; border-radius:0 0 8px 8px; padding:12px 16px 16px; }
+    .pf-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px 12px; }
+    .pf-ci { display:flex; flex-direction:column; }
+    .pf-ci label { font-size:.6rem; color:#9CA3AF; font-weight:500; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .pf-ci label .op { font-size:.58rem; color:#C4C9D4; font-style:italic; }
+    .pf-cv { background:#F3F4F6; border:1px solid #E5E7EB; border-radius:4px; padding:5px 8px; font-size:.77rem; color:#374151; min-height:30px; display:flex; align-items:center; justify-content:space-between; }
+    .pf-cv .ed svg { width:11px; height:11px; stroke:#1B5DA8; fill:none; stroke-width:2; cursor:pointer; }
+    .pf-ct { display:flex; gap:3px; }
+    .pf-ct select { flex:0 0 54px; background:#F3F4F6; border:1px solid #E5E7EB; border-radius:4px; padding:4px; font-size:.73rem; color:#374151; outline:none; }
+    .pf-ct .pf-cv { flex:1; }
+
+    @@media (max-width:720px) { .pf-grid { grid-template-columns:repeat(2,1fr); } }
+    @@media (max-width:480px) { .pf-grid { grid-template-columns:1fr; } .pf-wrap { padding:8px 8px 0; } }
+</style>
+
+<div class="pf-wrap">
+    <p class="pf-bread">Perfil de usuario</p>
+    <h1 class="pf-title">Perfil de usuario</h1>
+
+    <div class="pf-head">
+        <div class="pf-av" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div>
+            <div class="pf-hnombre">@nombre <span class="pf-badge">Activo</span></div>
+            <div class="pf-cargo">Operador</div>
+            <div class="pf-org">@email</div>
+        </div>
+    </div>
+
+    <div class="pf-tabs">
+        <span class="pf-tab active">Información básica</span>
+        <span class="pf-tab">Responsabilidades</span>
+        <span class="pf-tab">Historial de responsabilidades</span>
+    </div>
+
+    <div class="pf-body">
+        <div class="pf-grid">
+            <div class="pf-ci"><label>Nombres</label><div class="pf-cv">@nombre</div></div>
+            <div class="pf-ci"><label>Primer Apellido</label><div class="pf-cv">Quispe</div></div>
+            <div class="pf-ci"><label>Segundo Apellido</label><div class="pf-cv">Mamani</div></div>
+
+            <div class="pf-ci"><label>Tipo de Documento de Identidad</label><div class="pf-cv">DNI</div></div>
+            <div class="pf-ci"><label>N° de Documento de Identidad</label><div class="pf-cv">47832165</div></div>
+            <div class="pf-ci"><label>Fecha de nacimiento</label><div class="pf-cv">14 / 06 / 1990</div></div>
+
+            <div class="pf-ci"><label>Nacionalidad</label><div class="pf-cv">Peruano</div></div>
+            <div class="pf-ci"><label>Sexo</label><div class="pf-cv">Masculino</div></div>
+            <div class="pf-ci">
+                <label>Correo electrónico principal</label>
+                <div class="pf-cv">
+                    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">@email</span>
+                    <span class="ed" style="margin-left:4px;flex-shrink:0;"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>
+                </div>
+            </div>
+
+            <div class="pf-ci"><label>Correo electrónico secundario <span class="op">(Opcional)</span></label><div class="pf-cv">a.quispe&#64;gmail.com</div></div>
+            <div class="pf-ci">
+                <label>Teléfono Móvil</label>
+                <div class="pf-ct">
+                    <select disabled><option>+51</option></select>
+                    <div class="pf-cv">
+                        <span>987 654 321</span>
+                        <span class="ed" style="margin-left:4px;"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>
+                    </div>
+                </div>
+            </div>
+            <div class="pf-ci">
+                <label>Teléfono secundario <span class="op">(Opcional)</span></label>
+                <div class="pf-ct">
+                    <select disabled><option>Fijo</option></select>
+                    <div class="pf-cv">01 224 5678</div>
+                </div>
+            </div>
+
+            <div class="pf-ci"><label>Tipo de Contratación</label><div class="pf-cv">CAS</div></div>
+            <div class="pf-ci"><label>Fecha de contratación</label><div class="pf-cv">01 / 03 / 2022</div></div>
+            <div class="pf-ci"></div>
+        </div>
+    </div>
+</div>
+
+@Html.AntiForgeryToken()
